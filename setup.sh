@@ -1,16 +1,16 @@
-mkdir -p /gravel/system/
+mkdir -p /gravel/system/node
+
+GHOME=/gravel/system/node/home
 useradd --system --uid 501 --gid 1 \
-    --create-home --home-dir /gravel/system/gravelnode \
+    --create-home --home-dir $GHOME \
     gravelnode
-ln -sf $PWD/register.py /usr/local/bin/gravelregister
 
 echo "gravelnode ALL = (ALL) NOPASSWD: ALL" > /etc/sudoers.d/gravelnode
-chmod 440 /etc/sudoers.d/gravelnode
+chmod 440 /etc/sudoers.d/gravelnode || exit 1
 
-GHOME=/gravel/system/gravelnode
 if [ ! -e $GHOME/.ssh/id_rsa ]; then
-    sudo -u gravelnode mkdir $GHOME/.ssh/
-    sudo -u gravelnode ssh-keygen -f $GHOME/.ssh/id_rsa -N ''
+    sudo -u gravelnode mkdir $GHOME/.ssh/ || exit 1
+    sudo -u gravelnode ssh-keygen -f $GHOME/.ssh/id_rsa -N '' || exit 1
 
     echo
     echo "Run on master:"

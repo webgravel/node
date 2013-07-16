@@ -1,4 +1,6 @@
 name: gravel-node
-requires: gravel-package
+requires: gravel-common
 
 preinstall: ./setup.sh
+symlinks:
+- [register.py, /usr/local/bin/gravelregister]
