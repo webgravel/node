@@ -5,8 +5,9 @@ import re
 import socket
 import os
 import pwd
+import yaml
 
-sys.path.append('/gravel/pkg/gravel-common')
+import gravelnode
 
 import ssh_utils
 
@@ -24,15 +25,34 @@ def main():
     os.chown(os.path.dirname(key) + '/authorized_keys', pw.pw_uid, pw.pw_gid)
 
     self_address = try_adresses(hostname, key)
-    # adjust repo path
+
+    gravelnode.settings.data.master = sys.argv[1]
+    gravelnode.settings.save()
+
+    adjust_repo_path()
+
+def adjust_repo_path():
+    path = '/gravel/pkg/config.yaml'
+    conf = yaml.load(open(path))
+    conf['repo'] = 'ssh://' + gravelnode.master_ssh_addr()
+    with open(path, 'w') as f:
+        yaml.dump(conf, f)
 
 def try_adresses(hostname, key):
     port = get_ssh_port()
+    print 'SSH port:', port
     for ip in get_public_addresses():
         address = revdns(ip)
         print 'trying', ip, 'rev:', address
         address += ':' + port
-        ssh_utils.call(hostname, 'setaddress', address, key=key)
+        try:
+            ssh_utils.call(hostname, 'setaddress', address, key=key)
+        except subprocess.CalledProcessError:
+            pass
+        else:
+            print 'address', address, 'set'
+            return
+    sys.exit('none of addresses worked')
 
 def revdns(ip):
     if ip.startswith(('192.168.', '10.')):

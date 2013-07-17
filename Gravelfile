@@ -4,3 +4,4 @@ requires: gravel-common
 preinstall: ./setup.sh
 symlinks:
 - [register.py, /usr/local/bin/gravelregister]
+- [mastercmd.py, /usr/local/bin/gravelmastercmd]
