@@ -1,7 +1,9 @@
 import sys
+import os
 sys.path.append('/gravel/pkg/gravel-common')
 
 import graveldb
+import ssh_utils
 
 PATH = '/gravel/system/node'
 
@@ -15,3 +17,8 @@ settings = Settings()
 
 def master_ssh_addr():
     return 'gravelmaster@' + settings.data.master
+
+def master_call(*args, **kwargs):
+    _kwargs = dict(key=os.path.expanduser('~gravelnode/.ssh/id_rsa'))
+    _kwargs.update(kwargs)
+    return ssh_utils.call(master_ssh_addr(), *args, **_kwargs)
